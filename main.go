@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -45,6 +47,15 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&Book{})
 }
 
+func createBook(w http.ResponseWriter, r *http.Request) {
+	setContentType(w)
+	var book Book
+	json.NewDecoder(r.Body).Decode(&book)
+	book.ID = strconv.Itoa(rand.Int())
+	books = append(books, book)
+	json.NewEncoder(w).Encode(book)
+}
+
 func loadBooks() {
 	books = append(books, Book{ID: "1", Title: "The dark tower", Author: &Author{Name: "Stephen King"}})
 	books = append(books, Book{ID: "2", Title: "11/22/63", Author: &Author{Name: "Stephen King"}})
@@ -53,6 +64,7 @@ func loadBooks() {
 func getRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/books", getBooks).Methods("GET")
+	router.HandleFunc("/books", createBook).Methods("POST")
 	router.HandleFunc("/books/{id}", getBook).Methods("GET")
 	return router
 }
