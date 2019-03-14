@@ -22,7 +22,7 @@ type Author struct {
 	Name string `json:"name"`
 }
 
-var books []Book
+var idToBook = make(map[string]Book)
 
 func main() {
 	loadBooks()
@@ -32,33 +32,42 @@ func main() {
 
 func getBooks(w http.ResponseWriter, r *http.Request) {
 	setContentType(w)
-	json.NewEncoder(w).Encode(books)
+	json.NewEncoder(w).Encode(idToBook)
 }
 
 func getBook(w http.ResponseWriter, r *http.Request) {
 	setContentType(w)
-	params := mux.Vars(r)
-	for _, book := range books {
-		if book.ID == params["id"] {
-			json.NewEncoder(w).Encode(book)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(&Book{})
+	book := findBook(r)
+	json.NewEncoder(w).Encode(book)
 }
 
 func createBook(w http.ResponseWriter, r *http.Request) {
 	setContentType(w)
+
 	var book Book
 	json.NewDecoder(r.Body).Decode(&book)
 	book.ID = strconv.Itoa(rand.Int())
-	books = append(books, book)
+	idToBook[book.ID] = book
+
 	json.NewEncoder(w).Encode(book)
 }
 
+func updateBook(w http.ResponseWriter, r *http.Request) {
+	setContentType(w)
+
+	book := findBook(r)
+
+	var updated Book
+	json.NewDecoder(r.Body).Decode(&updated)
+	updated.ID = book.ID
+	idToBook[updated.ID] = updated
+
+	json.NewEncoder(w).Encode(updated)
+}
+
 func loadBooks() {
-	books = append(books, Book{ID: "1", Title: "The dark tower", Author: &Author{Name: "Stephen King"}})
-	books = append(books, Book{ID: "2", Title: "11/22/63", Author: &Author{Name: "Stephen King"}})
+	idToBook["1"] = Book{ID: "1", Title: "The dark tower", Author: &Author{Name: "Stephen King"}}
+	idToBook["2"] = Book{ID: "2", Title: "11/22/63", Author: &Author{Name: "Stephen King"}}
 }
 
 func getRouter() *mux.Router {
@@ -66,10 +75,16 @@ func getRouter() *mux.Router {
 	router.HandleFunc("/books", getBooks).Methods("GET")
 	router.HandleFunc("/books", createBook).Methods("POST")
 	router.HandleFunc("/books/{id}", getBook).Methods("GET")
+	router.HandleFunc("/books/{id}", updateBook).Methods("PUT")
 	return router
 }
 
 func setContentType(w http.ResponseWriter) {
-	// writer := *w
 	w.Header().Set("Content-Type", "application/json")
+}
+
+func findBook(r *http.Request) *Book {
+	params := mux.Vars(r)
+	book := idToBook[params["id"]]
+	return &book
 }
