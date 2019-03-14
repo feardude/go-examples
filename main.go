@@ -65,6 +65,12 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updated)
 }
 
+func deleteBook(w http.ResponseWriter, r *http.Request) {
+	setContentType(w)
+	params := mux.Vars(r)
+	delete(idToBook, params["id"])
+}
+
 func loadBooks() {
 	idToBook["1"] = Book{ID: "1", Title: "The dark tower", Author: &Author{Name: "Stephen King"}}
 	idToBook["2"] = Book{ID: "2", Title: "11/22/63", Author: &Author{Name: "Stephen King"}}
@@ -76,6 +82,7 @@ func getRouter() *mux.Router {
 	router.HandleFunc("/books", createBook).Methods("POST")
 	router.HandleFunc("/books/{id}", getBook).Methods("GET")
 	router.HandleFunc("/books/{id}", updateBook).Methods("PUT")
+	router.HandleFunc("/books/{id}", deleteBook).Methods("DELETE")
 	return router
 }
 
