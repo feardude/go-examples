@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+    crud:
+      build: .
+      image: smax/go-examples:crud
+      container_name: "go-examples_crud"
+      ports:
+      - "8080:8080"
