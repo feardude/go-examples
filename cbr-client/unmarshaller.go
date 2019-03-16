@@ -32,10 +32,11 @@ type FxRate struct {
 }
 
 // ToString returns formatted FxRate
-func (fxRate FxRate) ToString() string {
-	return fmt.Sprintf("%s: %d USD = %.4f RUB",
+func (fxRate FxRate) ToString(code string) string {
+	return fmt.Sprintf("%s: %d %s = %.4f RUB",
 		fxRate.Date.Format(time.RFC3339),
 		fxRate.Multiplier,
+		code,
 		fxRate.Value)
 }
 

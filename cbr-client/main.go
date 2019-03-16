@@ -9,11 +9,11 @@ import (
 )
 
 var cbrCodeToCurrency map[string]Currency
-var codeToFxRate map[string]FxRate
+var codeToFxRate map[string][]FxRate
 
 func main() {
 	loadCurrencies()
-	loadFxRate()
+	loadFxRates()
 }
 
 func load(body *strings.Reader) []byte {
@@ -40,18 +40,25 @@ func loadCurrencies() {
 	}
 }
 
-func loadFxRate() {
-	bytes := load(fxRatesRequestBody())
-	fxRates := FxRates(&bytes)
-
-	codeToFxRate = make(map[string]FxRate)
-	for _, fxRate := range fxRates {
-		codeToFxRate["R01235"] = fxRate
-		fmt.Println(fxRate.ToString())
+func loadFxRates() {
+	codeToFxRate = make(map[string][]FxRate)
+	for cbrCode := range cbrCodeToCurrency {
+		loadFxRate(cbrCode)
 	}
 }
 
-func fxRatesRequestBody() *strings.Reader {
+func loadFxRate(cbrCode string) {
+	bytes := load(fxRatesRequestBody(cbrCode))
+	fxRates := FxRates(&bytes)
+
+	for _, fxRate := range fxRates {
+		code := cbrCodeToCurrency[cbrCode].CodeEng
+		codeToFxRate[code] = append(codeToFxRate[code], fxRate)
+		fmt.Println(fxRate.ToString(code))
+	}
+}
+
+func fxRatesRequestBody(cbrCode string) *strings.Reader {
 	body := `<?xml version="1.0" encoding="utf-8"?>
 		<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
 		<soap12:Body>
@@ -66,7 +73,7 @@ func fxRatesRequestBody() *strings.Reader {
 	minus3days, _ := time.ParseDuration("-72h")
 	from := time.Now().Add(minus3days).Format(time.RFC3339)
 	to := time.Now().Format(time.RFC3339)
-	body = fmt.Sprintf(body, from, to, "R01235")
+	body = fmt.Sprintf(body, from, to, cbrCode)
 	body = strings.TrimSpace(body)
 	return strings.NewReader(body)
 }
