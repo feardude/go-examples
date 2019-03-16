@@ -6,41 +6,45 @@ import (
 	"strings"
 )
 
-type cbrCurrency struct {
-	CbrCode string `xml:"Vcode"`
-	EngCode string `xml:"VcharCode"`
-	Name    string `xml:"Vname"`
+// Currency represents currency structure
+type Currency struct {
+	CodeCbr string `xml:"Vcode"`
+	CodeEng string `xml:"VcharCode"`
+	NameRus string `xml:"Vname"`
+	NameEng string `xml:"VEngname"`
 }
 
-// Unmarshal parses input XML to currency
-func unmarshal(input *[]byte) {
+// ToString returns formatted Currency
+func ToString(currency Currency) string {
+	return fmt.Sprintf("%s (%s) – %s:%s",
+		currency.NameEng,
+		currency.NameRus,
+		currency.CodeEng,
+		currency.CodeCbr)
+}
+
+// Currencies parses input XML to []Currency and returns result
+func Currencies(input *[]byte) []Currency {
 	var currencies struct {
-		CbrCurrencies []cbrCurrency `xml:"Body>EnumValutesXMLResponse>EnumValutesXMLResult>ValuteData>EnumValutes"`
+		CbrCurrencies []Currency `xml:"Body>EnumValutesXMLResponse>EnumValutesXMLResult>ValuteData>EnumValutes"`
 	}
 	err := xml.Unmarshal(*input, &currencies)
 	if err == nil {
-		currencies.CbrCurrencies = filter(currencies.CbrCurrencies)
-		for _, c := range currencies.CbrCurrencies {
-			fmt.Println(toString(c))
-		}
-		return
+		return processed(currencies.CbrCurrencies)
 	}
 	panic(err)
 }
 
-func toString(cbrCurrency cbrCurrency) string {
-	return fmt.Sprintf("%s – %s:%s",
-		strings.TrimSpace(cbrCurrency.Name),
-		strings.TrimSpace(cbrCurrency.EngCode),
-		strings.TrimSpace(cbrCurrency.CbrCode))
-}
-
-func filter(cbrCurrencies []cbrCurrency) []cbrCurrency {
-	filtered := make([]cbrCurrency, 0)
-	for _, currency := range cbrCurrencies {
-		if currency.EngCode != "" {
-			filtered = append(filtered, currency)
+func processed(cbrCurrencies []Currency) []Currency {
+	processed := make([]Currency, 0)
+	for _, c := range cbrCurrencies {
+		if c.CodeEng != "" {
+			c.CodeCbr = strings.TrimSpace(c.CodeCbr)
+			c.CodeEng = strings.TrimSpace(c.CodeEng)
+			c.NameEng = strings.TrimSpace(c.NameEng)
+			c.NameRus = strings.TrimSpace(c.NameRus)
+			processed = append(processed, c)
 		}
 	}
-	return filtered
+	return processed
 }

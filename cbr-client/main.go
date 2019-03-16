@@ -7,21 +7,35 @@ import (
 	"strings"
 )
 
+var cbrCodeToCurrency map[string]Currency
+
 func main() {
+	loadCurrencies()
+}
+
+func load(body *strings.Reader) []byte {
 	client := http.Client{}
-	resp, err := client.Post("http://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx", "application/soap+xml", getRequestCurrencyCodes())
-	// resp, err := client.Post("http://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx", "application/soap+xml", getRequestCurrencyRates())
+	resp, err := client.Post("http://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx",
+		"application/soap+xml", body)
 
 	if err != nil {
 		panic(err)
 	}
 
 	defer resp.Body.Close()
-
 	bytes, _ := ioutil.ReadAll(resp.Body)
-	// fmt.Println(string(bytes))
+	return bytes
+}
 
-	unmarshal(&bytes)
+func loadCurrencies() {
+	bytes := load(currenciesRefDataRequestBody())
+	currencies := Currencies(&bytes)
+
+	cbrCodeToCurrency = make(map[string]Currency)
+	for _, currency := range currencies {
+		cbrCodeToCurrency[currency.CodeCbr] = currency
+		fmt.Println(ToString(currency))
+	}
 }
 
 func getRequestCurrencyRates() *strings.Reader {
@@ -41,7 +55,7 @@ func getRequestCurrencyRates() *strings.Reader {
 	return strings.NewReader(body)
 }
 
-func getRequestCurrencyCodes() *strings.Reader {
+func currenciesRefDataRequestBody() *strings.Reader {
 	body := `
 		<?xml version="1.0" encoding="utf-8"?>
 		<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
