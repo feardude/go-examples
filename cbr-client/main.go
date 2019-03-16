@@ -19,7 +19,9 @@ func main() {
 	defer resp.Body.Close()
 
 	bytes, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(bytes))
+	// fmt.Println(string(bytes))
+
+	unmarshal(&bytes)
 }
 
 func getRequestCurrencyRates() *strings.Reader {
