@@ -5,12 +5,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var cbrCodeToCurrency map[string]Currency
+var codeToFxRate map[string]FxRate
 
 func main() {
 	loadCurrencies()
+	loadFxRate()
 }
 
 func load(body *strings.Reader) []byte {
@@ -34,11 +37,21 @@ func loadCurrencies() {
 	cbrCodeToCurrency = make(map[string]Currency)
 	for _, currency := range currencies {
 		cbrCodeToCurrency[currency.CodeCbr] = currency
-		fmt.Println(ToString(currency))
 	}
 }
 
-func getRequestCurrencyRates() *strings.Reader {
+func loadFxRate() {
+	bytes := load(fxRatesRequestBody())
+	fxRates := FxRates(&bytes)
+
+	codeToFxRate = make(map[string]FxRate)
+	for _, fxRate := range fxRates {
+		codeToFxRate["R01235"] = fxRate
+		fmt.Println(fxRate.ToString())
+	}
+}
+
+func fxRatesRequestBody() *strings.Reader {
 	body := `<?xml version="1.0" encoding="utf-8"?>
 		<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
 		<soap12:Body>
@@ -50,7 +63,10 @@ func getRequestCurrencyRates() *strings.Reader {
 		</soap12:Body>
 		</soap12:Envelope>
 	`
-	body = fmt.Sprintf(body, "2019-03-15T00:00:00.000", "2019-03-15T00:00:00.000", "R01235")
+	minus3days, _ := time.ParseDuration("-72h")
+	from := time.Now().Add(minus3days).Format(time.RFC3339)
+	to := time.Now().Format(time.RFC3339)
+	body = fmt.Sprintf(body, from, to, "R01235")
 	body = strings.TrimSpace(body)
 	return strings.NewReader(body)
 }

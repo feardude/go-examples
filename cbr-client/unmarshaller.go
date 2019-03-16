@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // Currency represents currency structure
@@ -15,12 +16,27 @@ type Currency struct {
 }
 
 // ToString returns formatted Currency
-func ToString(currency Currency) string {
+func (currency Currency) ToString() string {
 	return fmt.Sprintf("%s (%s) – %s:%s",
 		currency.NameEng,
 		currency.NameRus,
 		currency.CodeEng,
 		currency.CodeCbr)
+}
+
+// FxRate represents currency rate structure
+type FxRate struct {
+	Date       time.Time `xml:"CursDate"`
+	Multiplier int16     `xml:"Vnom"`
+	Value      float32   `xml:"Vcurs"`
+}
+
+// ToString returns formatted FxRate
+func (fxRate FxRate) ToString() string {
+	return fmt.Sprintf("%s: %d USD = %.4f RUB",
+		fxRate.Date.Format(time.RFC3339),
+		fxRate.Multiplier,
+		fxRate.Value)
 }
 
 // Currencies parses input XML to []Currency and returns result
@@ -47,4 +63,16 @@ func processed(cbrCurrencies []Currency) []Currency {
 		}
 	}
 	return processed
+}
+
+// FxRates parses input XML to []FxRate and returns result
+func FxRates(input *[]byte) []FxRate {
+	var fxRates struct {
+		FxRates []FxRate `xml:"Body>GetCursDynamicXMLResponse>GetCursDynamicXMLResult>ValuteData>ValuteCursDynamic"`
+	}
+	err := xml.Unmarshal(*input, &fxRates)
+	if err == nil {
+		return fxRates.FxRates
+	}
+	panic(err)
 }
