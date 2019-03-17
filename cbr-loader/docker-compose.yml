@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+    crud:
+      build: .
+      image: smax/go-examples:cbr-loader
+      container_name: "go-examples_cbr-loader"
+      ports:
+      - "8080:8080"
