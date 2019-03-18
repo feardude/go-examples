@@ -73,14 +73,14 @@ func processed(cbrCurrencies []Currency) []Currency {
 
 // FxRates parses input XML to []FxRate and returns result
 func FxRates(input *[]byte) []FxRate {
-	var fxRates struct {
-		FxRates []CbrFxRate `xml:"Body>GetCursDynamicXMLResponse>GetCursDynamicXMLResult>ValuteData>ValuteCursDynamic"`
+	var cbrFxRates struct {
+		CbrFxRates []CbrFxRate `xml:"Body>GetCursDynamicXMLResponse>GetCursDynamicXMLResult>ValuteData>ValuteCursDynamic"`
 	}
-	err := xml.Unmarshal(*input, &fxRates)
+	err := xml.Unmarshal(*input, &cbrFxRates)
 	check(err)
 
 	var rates = make([]FxRate, 0)
-	for _, rate := range fxRates.FxRates {
+	for _, rate := range cbrFxRates.CbrFxRates {
 		rates = append(rates, FxRate{Date: rate.Date, Value: rate.Value / float32(rate.Multiplier)})
 	}
 	return rates

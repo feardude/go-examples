@@ -78,8 +78,6 @@ func AddCurrency(c Currency) {
 
 // AddFxRate stores new FX rate
 func AddFxRate(cbrCode string, fxRate FxRate) {
-	log.Printf("Storing FX rate [%s]", fxRate.ToString(cbrCode))
-
 	query, err := s.queries.Raw("insert-fx_rate")
 	check(err)
 
