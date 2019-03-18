@@ -37,12 +37,6 @@ func initQueries() *dotsql.DotSql {
 	return queries
 }
 
-func check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func initTables() {
 	initTable("create-table-currencies")
 	initTable("create-table-fx_rates")
