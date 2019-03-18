@@ -6,12 +6,15 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/max-samoylov/go-examples/cbr-loader/app/store"
 )
 
 var cbrCodeToCurrency map[string]Currency
 var codeToFxRate map[string][]FxRate
 
 func main() {
+	store.Init()
 	loadCurrencies()
 	loadFxRates()
 }
