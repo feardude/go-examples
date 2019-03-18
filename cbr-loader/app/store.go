@@ -75,3 +75,19 @@ func AddCurrency(c Currency) {
 	check(err)
 	tx.Commit()
 }
+
+// AddFxRate stores new FX rate
+func AddFxRate(cbrCode string, fxRate FxRate) {
+	log.Printf("Storing FX rate [%s]", fxRate.ToString(cbrCode))
+
+	query, err := s.queries.Raw("insert-fx_rate")
+	check(err)
+
+	tx, err := s.db.Begin()
+	defer tx.Rollback()
+	check(err)
+
+	_, err = tx.Exec(query, cbrCode, fxRate.Date, fxRate.Value)
+	check(err)
+	tx.Commit()
+}

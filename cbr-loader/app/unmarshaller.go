@@ -24,18 +24,23 @@ func (currency Currency) ToString() string {
 		currency.CodeCbr)
 }
 
-// FxRate represents currency rate structure
-type FxRate struct {
+// CbrFxRate represents CBR currency rate structure
+type CbrFxRate struct {
 	Date       time.Time `xml:"CursDate"`
 	Multiplier int16     `xml:"Vnom"`
 	Value      float32   `xml:"Vcurs"`
 }
 
+// FxRate represents currency rate structure
+type FxRate struct {
+	Date  time.Time
+	Value float32
+}
+
 // ToString returns formatted FxRate
 func (fxRate FxRate) ToString(code string) string {
-	return fmt.Sprintf("%s: %d %s = %.4f RUB",
+	return fmt.Sprintf("%s: 1 %s = %.8f RUB",
 		fxRate.Date.Format(time.RFC3339),
-		fxRate.Multiplier,
 		code,
 		fxRate.Value)
 }
@@ -69,11 +74,14 @@ func processed(cbrCurrencies []Currency) []Currency {
 // FxRates parses input XML to []FxRate and returns result
 func FxRates(input *[]byte) []FxRate {
 	var fxRates struct {
-		FxRates []FxRate `xml:"Body>GetCursDynamicXMLResponse>GetCursDynamicXMLResult>ValuteData>ValuteCursDynamic"`
+		FxRates []CbrFxRate `xml:"Body>GetCursDynamicXMLResponse>GetCursDynamicXMLResult>ValuteData>ValuteCursDynamic"`
 	}
 	err := xml.Unmarshal(*input, &fxRates)
-	if err == nil {
-		return fxRates.FxRates
+	check(err)
+
+	var rates = make([]FxRate, 0)
+	for _, rate := range fxRates.FxRates {
+		rates = append(rates, FxRate{Date: rate.Date, Value: rate.Value / float32(rate.Multiplier)})
 	}
-	panic(err)
+	return rates
 }

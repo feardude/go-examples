@@ -8,7 +8,7 @@ create table if not exists currencies (
 
 -- name: create-table-fx_rates
 create table if not exists fx_rates (
-    code_cbr varchar(5) references currencies(code_cbr),
+    code_cbr varchar references currencies(code_cbr),
     date_time timestamp not null,
     value real not null
 );

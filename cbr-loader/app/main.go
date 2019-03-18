@@ -57,7 +57,7 @@ func loadFxRate(cbrCode string) {
 	for _, fxRate := range fxRates {
 		code := cbrCodeToCurrency[cbrCode].CodeEng
 		codeToFxRate[code] = append(codeToFxRate[code], fxRate)
-		fmt.Println(fxRate.ToString(code))
+		AddFxRate(cbrCode, fxRate)
 	}
 }
 
