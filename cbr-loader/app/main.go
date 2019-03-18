@@ -6,17 +6,16 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/max-samoylov/go-examples/cbr-loader/app/store"
 )
 
 var cbrCodeToCurrency map[string]Currency
 var codeToFxRate map[string][]FxRate
 
 func main() {
-	store.Init()
+	Init()
 	loadCurrencies()
 	loadFxRates()
+	Shutdown()
 }
 
 func load(body *strings.Reader) []byte {
@@ -40,6 +39,7 @@ func loadCurrencies() {
 	cbrCodeToCurrency = make(map[string]Currency)
 	for _, currency := range currencies {
 		cbrCodeToCurrency[currency.CodeCbr] = currency
+		AddCurrency(currency)
 	}
 }
 
