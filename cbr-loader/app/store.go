@@ -29,7 +29,10 @@ func initDB() *sql.DB {
 	connString := "user=feardude dbname=feardude sslmode=disable"
 	db, err := sql.Open("postgres", connString)
 	check(err)
-	db.SetMaxOpenConns(100)
+
+	// db.SetMaxOpenConns(100)
+	// db.SetMaxIdleConns(20)
+
 	return db
 }
 
@@ -56,20 +59,6 @@ func ShutdownDB() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// AddCurrency stores new currency in DB
-func AddCurrency(c Currency) {
-	query, err := s.queries.Raw("insert-currency")
-	check(err)
-
-	tx, err := s.db.Begin()
-	defer tx.Rollback()
-	check(err)
-
-	_, err = tx.Exec(query, c.CodeCbr, c.CodeEng, c.NameRus, c.NameEng)
-	check(err)
-	tx.Commit()
 }
 
 // AddFxRate stores new FX rate

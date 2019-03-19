@@ -40,7 +40,6 @@ func loadCurrencies() {
 	cbrCodeToCurrency = make(map[string]Currency)
 	for _, currency := range currencies {
 		cbrCodeToCurrency[currency.CodeCbr] = currency
-		AddCurrency(currency)
 	}
 }
 
