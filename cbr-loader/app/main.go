@@ -14,10 +14,10 @@ var cbrCodeToCurrency map[string]Currency
 var codeToFxRate map[string][]FxRate
 
 func main() {
-	Init()
+	InitDB()
 	loadCurrencies()
 	loadFxRates()
-	Shutdown()
+	ShutdownDB()
 }
 
 func load(body *strings.Reader) []byte {
@@ -70,10 +70,12 @@ func findLastDate(cbrCode string) time.Time {
 func loadFxRate(cbrCode string, lastDate time.Time, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	log.Printf("Loading %s from %s\n", cbrCodeToCurrency[cbrCode].CodeEng, lastDate)
+	log.Printf("Loading FX rates for %s from %s\n", cbrCodeToCurrency[cbrCode].CodeEng, lastDate)
 
 	bytes := load(fxRatesRequestBody(cbrCode, lastDate))
 	fxRates := FxRates(&bytes)
+
+	log.Printf("Loaded %d FX rates for %s\n", len(fxRates), cbrCodeToCurrency[cbrCode].CodeEng)
 
 	for _, fxRate := range fxRates {
 		AddFxRate(fxRate)
@@ -93,12 +95,9 @@ func fxRatesRequestBody(cbrCode string, lastDate time.Time) *strings.Reader {
 		</soap12:Envelope>
 	`
 	now := time.Now()
-	if now.After(lastDate) {
-		from := lastDate.Format(time.RFC3339)
-		to := now.Format(time.RFC3339)
-		body = fmt.Sprintf(body, from, to, cbrCode)
-		body = strings.TrimSpace(body)
-		return strings.NewReader(body)
-	}
-	return nil
+	from := lastDate.Format(time.RFC3339)
+	to := now.Format(time.RFC3339)
+	body = fmt.Sprintf(body, from, to, cbrCode)
+	body = strings.TrimSpace(body)
+	return strings.NewReader(body)
 }

@@ -17,8 +17,8 @@ type service struct {
 
 var s *service
 
-// Init performs DB initialization
-func Init() {
+// InitDB performs DB initialization
+func InitDB() {
 	db := initDB()
 	queries := initQueries()
 	s = &service{db: db, queries: queries}
@@ -50,8 +50,8 @@ func initTable(query string) {
 	check(err)
 }
 
-// Shutdown closes DB connection pool
-func Shutdown() {
+// ShutdownDB closes DB connection pool
+func ShutdownDB() {
 	err := s.db.Close()
 	if err != nil {
 		log.Fatal(err)
