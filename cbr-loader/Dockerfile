@@ -9,5 +9,6 @@ RUN go build -ldflags "-s -w" -o cbr-loader ./app
 FROM alpine:3.9
 
 COPY --from=build /go/src/github.com/max-samoylov/go-examples/cbr-loader/cbr-loader /srv/cbr-loader
+COPY --from=build /go/src/github.com/max-samoylov/go-examples/cbr-loader/app/queries.sql /queries.sql
 
 ENTRYPOINT [ "/srv/cbr-loader" ]

@@ -1,0 +1,4 @@
+github.com/gchaincl/dotsql v0.1.0 h1:7d9YDkEJwWCsoUtERXKRTDFvyAU9CXiHuTqurVxBdf4=
+github.com/gchaincl/dotsql v0.1.0/go.mod h1:p7/SafmAOftYCqOhMKQKDIXDYg8CXl+8X7/8Qat1I8w=
+github.com/lib/pq v1.0.0 h1:X5PMW56eZitiTeO7tKzZxFCSpbFZJtkMMooicw2us9A=
+github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
