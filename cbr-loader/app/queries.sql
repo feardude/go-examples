@@ -26,3 +26,7 @@ on conflict do nothing;
 select max(date_time)
 from fx_rates
 where code_cbr = $1;
+
+-- name: select-currencies
+select code_cbr as CodeCbr,  code_eng, name_rus, name_eng
+from currencies;

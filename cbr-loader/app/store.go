@@ -100,3 +100,21 @@ func GetLastDate(cbrCode string) time.Time {
 
 	return lastDate
 }
+
+// GetCurrencies returns all currencies currently stored
+func GetCurrencies() []Currency {
+	query, err := s.queries.Raw("select-currencies")
+	check(err)
+
+	rows, err := s.db.Query(query)
+	check(err)
+
+	currencies := make([]Currency, 0)
+	for rows.Next() {
+		var currency Currency
+		err := rows.Scan(&currency.CodeCbr, &currency.CodeEng, &currency.NameRus, &currency.NameEng)
+		check(err)
+		currencies = append(currencies, currency)
+	}
+	return currencies
+}

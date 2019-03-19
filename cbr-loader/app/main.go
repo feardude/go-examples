@@ -35,8 +35,7 @@ func load(body *strings.Reader) []byte {
 }
 
 func loadCurrencies() {
-	bytes := load(currenciesRefDataRequestBody())
-	currencies := Currencies(&bytes)
+	currencies := GetCurrencies()
 
 	cbrCodeToCurrency = make(map[string]Currency)
 	for _, currency := range currencies {
@@ -69,16 +68,14 @@ func findLastDate(cbrCode string) time.Time {
 }
 
 func loadFxRate(cbrCode string, lastDate time.Time, wg *sync.WaitGroup) {
-	log.Printf("Loading %s from %s\n", cbrCodeToCurrency[cbrCode].CodeEng, lastDate)
-
 	defer wg.Done()
+
+	log.Printf("Loading %s from %s\n", cbrCodeToCurrency[cbrCode].CodeEng, lastDate)
 
 	bytes := load(fxRatesRequestBody(cbrCode, lastDate))
 	fxRates := FxRates(&bytes)
 
 	for _, fxRate := range fxRates {
-		// code := cbrCodeToCurrency[fxRate.CbrCode].CodeEng
-		// codeToFxRate[code] = append(codeToFxRate[code], fxRate)
 		AddFxRate(fxRate)
 	}
 }
@@ -104,19 +101,4 @@ func fxRatesRequestBody(cbrCode string, lastDate time.Time) *strings.Reader {
 		return strings.NewReader(body)
 	}
 	return nil
-}
-
-func currenciesRefDataRequestBody() *strings.Reader {
-	body := `
-		<?xml version="1.0" encoding="utf-8"?>
-		<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-		<soap12:Body>
-			<EnumValutesXML xmlns="http://web.cbr.ru/">
-				<Seld>false</Seld>
-			</EnumValutesXML>
-		</soap12:Body>
-		</soap12:Envelope>
-	`
-	body = strings.TrimSpace(body)
-	return strings.NewReader(body)
 }
