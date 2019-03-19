@@ -14,10 +14,12 @@ var cbrCodeToCurrency map[string]Currency
 var codeToFxRate map[string][]FxRate
 
 func main() {
+	log.Println("Started CBR loader")
 	InitDB()
 	loadCurrencies()
 	loadFxRates()
 	ShutdownDB()
+	log.Println("Finished CBR loader")
 }
 
 func load(body *strings.Reader) []byte {
