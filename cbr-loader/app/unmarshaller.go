@@ -26,15 +26,17 @@ func (currency Currency) ToString() string {
 
 // CbrFxRate represents CBR currency rate structure
 type CbrFxRate struct {
+	CbrCode    string    `xml:"Vcode"`
 	Date       time.Time `xml:"CursDate"`
-	Multiplier int16     `xml:"Vnom"`
+	Multiplier int32     `xml:"Vnom"`
 	Value      float32   `xml:"Vcurs"`
 }
 
 // FxRate represents currency rate structure
 type FxRate struct {
-	Date  time.Time
-	Value float32
+	CbrCode string
+	Date    time.Time
+	Value   float32
 }
 
 // ToString returns formatted FxRate
@@ -81,7 +83,7 @@ func FxRates(input *[]byte) []FxRate {
 
 	var rates = make([]FxRate, 0)
 	for _, rate := range cbrFxRates.CbrFxRates {
-		rates = append(rates, FxRate{Date: rate.Date, Value: rate.Value / float32(rate.Multiplier)})
+		rates = append(rates, FxRate{CbrCode: rate.CbrCode, Date: rate.Date, Value: rate.Value / float32(rate.Multiplier)})
 	}
 	return rates
 }

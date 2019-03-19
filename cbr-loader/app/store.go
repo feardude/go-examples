@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/gchaincl/dotsql"
 
@@ -28,6 +29,7 @@ func initDB() *sql.DB {
 	connString := "user=feardude dbname=feardude sslmode=disable"
 	db, err := sql.Open("postgres", connString)
 	check(err)
+	db.SetMaxOpenConns(100)
 	return db
 }
 
@@ -71,7 +73,7 @@ func AddCurrency(c Currency) {
 }
 
 // AddFxRate stores new FX rate
-func AddFxRate(cbrCode string, fxRate FxRate) {
+func AddFxRate(fxRate FxRate) {
 	query, err := s.queries.Raw("insert-fx_rate")
 	check(err)
 
@@ -79,7 +81,22 @@ func AddFxRate(cbrCode string, fxRate FxRate) {
 	defer tx.Rollback()
 	check(err)
 
-	_, err = tx.Exec(query, cbrCode, fxRate.Date, fxRate.Value)
+	_, err = tx.Exec(query, fxRate.CbrCode, fxRate.Date, fxRate.Value)
 	check(err)
 	tx.Commit()
+}
+
+// GetLastDate finds last FX rate date for cbrCode currency
+func GetLastDate(cbrCode string) time.Time {
+	query, err := s.queries.Raw("select-last-date")
+	check(err)
+
+	result, err := s.db.Query(query, cbrCode)
+	check(err)
+
+	var lastDate time.Time
+	result.Next()
+	result.Scan(&lastDate)
+
+	return lastDate
 }

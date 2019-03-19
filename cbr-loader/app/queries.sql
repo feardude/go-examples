@@ -21,3 +21,8 @@ on conflict do nothing;
 -- name: insert-fx_rate
 insert into fx_rates values ($1, $2, $3)
 on conflict do nothing;
+
+-- name: select-last-date
+select max(date_time)
+from fx_rates
+where code_cbr = $1;
