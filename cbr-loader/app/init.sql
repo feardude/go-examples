@@ -31,7 +31,6 @@ insert into currencies values
 ('R01370', 'KGS', 'Киргизский сом', 'Kyrgyzstan Som'),
 ('R01375', 'CNY', 'Китайский юань', 'China Yuan'),
 ('R01500', 'MDL', 'Молдавский лей', 'Moldova Lei'),
-('R01510A', 'DEM', 'Немецкая марка', 'Deutsche Mark'),
 ('R01535', 'NOK', 'Норвежская крона', 'Norwegian Krone'),
 ('R01565', 'PLN', 'Польский злотый', 'Polish Zloty'),
 ('R01585F', 'RON', 'Румынский лей', 'Romanian Leu'),
@@ -45,7 +44,6 @@ insert into currencies values
 ('R01760', 'CZK', 'Чешская крона', 'Czech Koruna'),
 ('R01770', 'SEK', 'Шведская крона', 'Swedish Krona'),
 ('R01775', 'CHF', 'Швейцарский франк', 'Swiss Franc'),
-('R01790', 'XEU', 'ЭКЮ', 'ECU'),
 ('R01810', 'ZAR', 'Южноафриканский рэнд', 'S.African Rand'),
 ('R01815', 'KRW', 'Вон Республики Корея', 'South Korean Won'),
 ('R01820', 'JPY', 'Японская иена', 'Japanese Yen');
