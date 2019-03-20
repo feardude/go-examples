@@ -22,11 +22,10 @@ func InitDB() {
 	db := initDB()
 	queries := initQueries()
 	s = &service{db: db, queries: queries}
-	initTables()
 }
 
 func initDB() *sql.DB {
-	connString := "user=feardude dbname=feardude sslmode=disable"
+	connString := "host=postgres user=postgres dbname=postgres sslmode=disable"
 	db, err := sql.Open("postgres", connString)
 	check(err)
 	db.SetMaxOpenConns(100)
@@ -37,17 +36,6 @@ func initQueries() *dotsql.DotSql {
 	queries, err := dotsql.LoadFromFile("./queries.sql")
 	check(err)
 	return queries
-}
-
-func initTables() {
-	initTable("create-table-currencies")
-	initTable("create-table-fx_rates")
-}
-
-func initTable(query string) {
-	query, err := s.queries.Raw(query)
-	_, err = s.db.Exec(query)
-	check(err)
 }
 
 // ShutdownDB closes DB connection pool

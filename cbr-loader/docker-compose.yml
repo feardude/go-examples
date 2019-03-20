@@ -1,9 +1,21 @@
 version: '3'
 
 services:
-    cbr-loader:
-      build: .
-      image: smax/cbr-loader:latest
-      container_name: "cbr-loader"
-      ports:
-      - "8080:8080"
+  cbr-loader:
+    build: .
+    image: smax/cbr-loader:latest
+    container_name: "cbr-loader"
+    depends_on: 
+      - "postgres"
+  postgres:
+    image: postgres:11.2-alpine
+    container_name: "currencies-db"
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgres/data
+      - ./app/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+volumes:
+  db-data:
