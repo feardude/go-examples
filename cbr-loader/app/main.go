@@ -79,6 +79,10 @@ func loadFxRate(cbrCode string, lastDate time.Time, wg *sync.WaitGroup) {
 	log.Printf("Loaded %d FX rates for %s\n", len(fxRates), cbrCodeToCurrency[cbrCode].CodeEng)
 
 	for _, fxRate := range fxRates {
+		// Avoid merged codes for single currency
+		// Example: request for R01670 (TJS) returns two codes: R01670 and R01670B
+		// We store only original R01670
+		fxRate.CbrCode = cbrCode
 		AddFxRate(fxRate)
 	}
 }
