@@ -26,10 +26,7 @@ func load(body *strings.Reader) []byte {
 	client := http.Client{}
 	resp, err := client.Post("http://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx",
 		"application/soap+xml", body)
-
-	if err != nil {
-		panic(err)
-	}
+	check(err)
 
 	defer resp.Body.Close()
 	bytes, _ := ioutil.ReadAll(resp.Body)
@@ -38,6 +35,9 @@ func load(body *strings.Reader) []byte {
 
 func loadCurrencies() {
 	currencies := GetCurrencies()
+	if len(currencies) == 0 {
+		log.Fatal("No currencies in DB. Shutting down...")
+	}
 
 	cbrCodeToCurrency = make(map[string]Currency)
 	for _, currency := range currencies {
