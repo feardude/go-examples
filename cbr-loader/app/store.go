@@ -33,7 +33,7 @@ func initDB() *sql.DB {
 }
 
 func initQueries() *dotsql.DotSql {
-	queries, err := dotsql.LoadFromFile("./queries.sql")
+	queries, err := dotsql.LoadFromFile("./sql/queries.sql")
 	check(err)
 	return queries
 }
