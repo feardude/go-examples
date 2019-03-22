@@ -6,16 +6,15 @@ services:
     image: smax/cbr-loader:latest
     container_name: "cbr-loader"
     depends_on: 
-      - "postgres"
-  postgres:
+      - "currencies-db"
+  currencies-db:
     image: postgres:11.2-alpine
     container_name: "currencies-db"
-    ports:
-      - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgres/data
+      - currencies-db:/var/lib/postgresql/data
       - ./app/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
 
 volumes:
-  db-data:
+  currencies-db:
+    external: true

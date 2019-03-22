@@ -25,7 +25,7 @@ func InitDB() {
 }
 
 func initDB() *sql.DB {
-	connString := "host=postgres user=postgres dbname=postgres sslmode=disable"
+	connString := "host=currencies-db user=postgres dbname=postgres sslmode=disable"
 	db, err := sql.Open("postgres", connString)
 	check(err)
 	db.SetMaxOpenConns(100)
