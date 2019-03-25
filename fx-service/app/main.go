@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -20,7 +21,9 @@ func main() {
 }
 
 func getCurrencies(w http.ResponseWriter, r *http.Request) {
-
+	setContentType(w)
+	currencies := GetCurrencies()
+	json.NewEncoder(w).Encode(currencies)
 }
 
 func getRate(w http.ResponseWriter, r *http.Request) {
