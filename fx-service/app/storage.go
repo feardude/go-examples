@@ -16,7 +16,8 @@ type service struct {
 
 var s *service
 
-// InitDB performs DB initialization
+// InitDB performs DB initialization.
+// To avoid memory leaks always defer ShutdownDB() call.
 func InitDB() {
 	db := initDB()
 	queries := initQueries()
