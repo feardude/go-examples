@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -27,7 +29,11 @@ func getCurrencies(w http.ResponseWriter, r *http.Request) {
 }
 
 func getRate(w http.ResponseWriter, r *http.Request) {
-
+	setContentType(w)
+	params := mux.Vars(r)
+	code := strings.ToUpper(params["code"])
+	rate := GetRate(code, time.Now())
+	json.NewEncoder(w).Encode(rate)
 }
 
 func check(err error) {

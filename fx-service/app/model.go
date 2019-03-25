@@ -14,7 +14,7 @@ type Currency struct {
 
 // FxRate represents currency rate structure
 type FxRate struct {
-	CbrCode string
+	EngCode string
 	Date    time.Time
 	Value   float32
 }

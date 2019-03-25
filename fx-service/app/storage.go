@@ -53,7 +53,7 @@ func AddFxRate(fxRate FxRate) {
 	defer tx.Rollback()
 	check(err)
 
-	_, err = tx.Exec(query, fxRate.CbrCode, fxRate.Date, fxRate.Value)
+	_, err = tx.Exec(query, fxRate.EngCode, fxRate.Date, fxRate.Value)
 	check(err)
 	tx.Commit()
 }
@@ -89,4 +89,20 @@ func GetCurrencies() []Currency {
 		currencies = append(currencies, currency)
 	}
 	return currencies
+}
+
+// GetRate returns FX rate for single currency on selected date
+func GetRate(code string, validOn time.Time) FxRate {
+	query := findQuery("select-rate")
+	row := s.db.QueryRow(query, code, validOn)
+
+	var rate FxRate
+	row.Scan(&rate.EngCode, &rate.Date, &rate.Value)
+	return rate
+}
+
+func findQuery(name string) string {
+	query, err := s.queries.Raw(name)
+	check(err)
+	return query
 }
