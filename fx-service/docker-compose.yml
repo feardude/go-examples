@@ -5,6 +5,8 @@ services:
     build: .
     image: smax/fx-service:latest
     container_name: "fx-service"
+    ports:
+      - "80:8080"
     depends_on: 
       - "currencies-db"
   currencies-db:
