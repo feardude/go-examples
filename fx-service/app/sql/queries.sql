@@ -11,5 +11,5 @@ from fx_rates
 where code_cbr = $1;
 
 -- name: select-currencies
-select code_cbr as CodeCbr,  code_eng, name_rus, name_eng
+select code_cbr, code_eng, name_rus, name_eng
 from currencies;
