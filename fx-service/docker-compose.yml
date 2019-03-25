@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  fx-service:
+    build: .
+    image: smax/fx-service:latest
+    container_name: "fx-service"
+    depends_on: 
+      - "currencies-db"
+  currencies-db:
+    image: postgres:11.2-alpine
+    container_name: "currencies-db"
+    volumes:
+      - currencies-db:/var/lib/postgresql/data
+      - ./app/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+volumes:
+  currencies-db:
+    name: currencies-db
