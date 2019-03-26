@@ -12,28 +12,31 @@ import (
 
 func main() {
 	log.Println("Started FX service")
-	InitDB()
+	defer log.Println("Finished FX service")
 
+	// TODO: Graceful shutdown
+	InitDB()
 	defer ShutdownDB()
 
 	router := getRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
-
-	log.Println("Finished FX service")
 }
 
 func getCurrencies(w http.ResponseWriter, r *http.Request) {
-	setContentType(w)
 	currencies := GetCurrencies()
-	json.NewEncoder(w).Encode(currencies)
+	jsonResponse(w, currencies)
 }
 
 func getRate(w http.ResponseWriter, r *http.Request) {
-	setContentType(w)
 	params := mux.Vars(r)
 	code := strings.ToUpper(params["code"])
 	rate := GetRate(code, time.Now())
-	json.NewEncoder(w).Encode(rate)
+	jsonResponse(w, rate)
+}
+
+func jsonResponse(w http.ResponseWriter, object interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(object)
 }
 
 func check(err error) {
@@ -47,8 +50,4 @@ func getRouter() *mux.Router {
 	router.HandleFunc("/currencies", getCurrencies).Methods("GET")
 	router.HandleFunc("/currencies/{code}", getRate).Methods("GET")
 	return router
-}
-
-func setContentType(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
 }
