@@ -29,9 +29,18 @@ func getCurrencies(w http.ResponseWriter, r *http.Request) {
 
 func getRate(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	code := strings.ToUpper(params["code"])
-	rate := GetRate(code, time.Now())
+	base := strings.ToUpper(params["base"])
+	rate := GetRate(base, time.Now())
+	rate.Quote = resolveQuoteCode(params)
 	jsonResponse(w, rate)
+}
+
+func resolveQuoteCode(params map[string]string) string {
+	quote := params["quote"]
+	if quote == "" {
+		quote = "RUB"
+	}
+	return strings.ToUpper(quote)
 }
 
 func jsonResponse(w http.ResponseWriter, object interface{}) {
@@ -48,6 +57,6 @@ func check(err error) {
 func getRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/currencies", getCurrencies).Methods("GET")
-	router.HandleFunc("/currencies/{code}", getRate).Methods("GET")
+	router.HandleFunc("/currencies/{base}", getRate).Methods("GET")
 	return router
 }

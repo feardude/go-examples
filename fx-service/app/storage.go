@@ -92,9 +92,9 @@ func GetCurrencies() []Currency {
 }
 
 // GetRate returns FX rate for single currency on selected date
-func GetRate(code string, validOn time.Time) FxRate {
+func GetRate(base string, validOn time.Time) FxRate {
 	query := findQuery("select-rate")
-	row := s.db.QueryRow(query, code, validOn)
+	row := s.db.QueryRow(query, base, validOn)
 
 	var rate FxRate
 	row.Scan(&rate.EngCode, &rate.Date, &rate.Value)
