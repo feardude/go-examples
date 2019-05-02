@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,10 +16,8 @@ var codeToFxRate map[string][]FxRate
 
 func main() {
 	log.Println("Started CBR loader")
-	InitDB()
 	loadCurrencies()
 	loadFxRates()
-	ShutdownDB()
 	log.Println("Finished CBR loader")
 }
 
@@ -34,7 +33,12 @@ func load(body *strings.Reader) []byte {
 }
 
 func loadCurrencies() {
-	currencies := GetCurrencies()
+	client := http.Client{}
+	resp, err := client.Get("http://fx-service:8080/currencies")
+	check(err)
+
+	var currencies []Currency
+	json.NewDecoder(resp.Body).Decode(&currencies)
 	if len(currencies) == 0 {
 		log.Fatal("No currencies in DB. Shutting down...")
 	}

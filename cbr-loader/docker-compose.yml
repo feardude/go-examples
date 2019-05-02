@@ -1,20 +1,12 @@
-version: '3.4'
+version: '3.5'
 
 services:
   cbr-loader:
     build: .
     image: smax/cbr-loader:latest
     container_name: "cbr-loader"
-    depends_on: 
-      - "currencies-db"
-  currencies-db:
-    image: postgres:11.2-alpine
-    container_name: "currencies-db"
-    volumes:
-      - currencies-db:/var/lib/postgresql/data
-      - ./app/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: always
 
-volumes:
-  currencies-db:
-    name: currencies-db
+networks:
+  default:
+    external:
+      name: fx

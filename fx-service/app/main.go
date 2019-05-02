@@ -23,6 +23,7 @@ func main() {
 }
 
 func getCurrencies(w http.ResponseWriter, r *http.Request) {
+	log.Println("Requested currencies")
 	currencies := GetCurrencies()
 	jsonResponse(w, currencies)
 }
